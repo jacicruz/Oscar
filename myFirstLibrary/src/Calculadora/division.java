@@ -15,6 +15,8 @@ public class division {
     return(num/num2);
     } else{
         JOptionPane.showMessageDialog(null, "No existe la division entre 0");
-    } return(0);
+        System.exit(0);
+    }
+        return 0;
     }
 }
