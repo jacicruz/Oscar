@@ -38,7 +38,6 @@ public class Conexion {
     public void cambiarBaseDeDatos(String nombreBaseDatos) {
         try {
             if(connection != null){
-            String base = JOptionPane.showInputDialog(null, "Ingresa la base a usar");
             connection.createStatement().execute("USE " + nombreBaseDatos);
             System.out.println("Usando la base de datos: " + nombreBaseDatos);
             }
