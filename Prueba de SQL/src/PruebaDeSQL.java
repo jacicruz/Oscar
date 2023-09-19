@@ -10,7 +10,7 @@ public class PruebaDeSQL {
         String puerto = JOptionPane.showInputDialog(null, "Ingresa tu puerto");
         String usuario = JOptionPane.showInputDialog(null, "Ingresa tu usuario");
         String contraseña = JOptionPane.showInputDialog(null, "Ingresa tu contraseña");
-        Conexion con = new Conexion(host, puerto, usuario, contraseña);
+        Conexion con = new Conexion();
         short opcion = 1000;
         Scanner scan = new Scanner(System.in);
         do {
@@ -30,8 +30,11 @@ public class PruebaDeSQL {
             opcion = scan.nextShort();
             switch (opcion) {
                 case 1:
-                    con.connect();
+                    con.connect(host, puerto, usuario, contraseña);
                     break;
+                case 2:
+                    String base = JOptionPane.showInputDialog(null, "Ingresa la base a usar");
+                    con.cambiarBaseDeDatos(base);
             }
         } while (opcion != 0);
     }

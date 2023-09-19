@@ -2,23 +2,11 @@ package Conector;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 public class Conexion {
-    private final String host;
-    private final String port;
-    private final String user;
-    private final String password;
-    private final String database = null;
-    private Connection connection;
-
-    public Conexion(String host, String port, String user, String password) {
-        this.host = host;
-        this.port = port;
-        this.user = user;
-        this.password = password;
-    }
-
-    public void connect() {
+    Connection connection;
+    public void connect(String host, String port, String user, String password) {
      String jdbcUrl = "jdbc:mysql://" + host + ":" + port + "/";
 
      try {
@@ -45,6 +33,17 @@ public class Conexion {
             }
         } catch (SQLException e) {
             System.err.println("Error al cerrar la conexión: " + e.getMessage());
+        }
+    }
+    public void cambiarBaseDeDatos(String nombreBaseDatos) {
+        try {
+            if(connection != null){
+            String base = JOptionPane.showInputDialog(null, "Ingresa la base a usar");
+            connection.createStatement().execute("USE " + nombreBaseDatos);
+            System.out.println("Usando la base de datos: " + nombreBaseDatos);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cambiar de base de datos: " + e.getMessage());
         }
     }
 }
