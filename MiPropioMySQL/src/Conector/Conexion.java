@@ -8,7 +8,6 @@ public class Conexion {
     Connection connection;
     public void connect(String host, String port, String user, String password) {
      String jdbcUrl = "jdbc:mysql://" + host + ":" + port + "/";
-
      try {
          // Asegúrate de cargar el controlador JDBC
         Class.forName("com.mysql.cj.jdbc.Driver");
@@ -77,4 +76,13 @@ public class Conexion {
         System.out.println(e.getMessage());
     }
     }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+    
 }

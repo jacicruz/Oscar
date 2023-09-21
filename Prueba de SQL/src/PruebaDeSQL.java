@@ -2,7 +2,7 @@
 import Conector.Conexion;
 import java.util.Scanner;
 import javax.swing.JOptionPane;
-
+import Tablas.Tablas;
 public class PruebaDeSQL {
 
     public static void main(String[] args) {
@@ -11,6 +11,7 @@ public class PruebaDeSQL {
         String usuario = JOptionPane.showInputDialog(null, "Ingresa tu usuario");
         String contraseña = JOptionPane.showInputDialog(null, "Ingresa tu contraseña");
         Conexion con = new Conexion();
+        Tablas tab = new Tablas();
         short opcion;
         Scanner scan = new Scanner(System.in);
         do {
@@ -40,6 +41,11 @@ public class PruebaDeSQL {
                 case 3:
                     String base = JOptionPane.showInputDialog(null, "Ingresa la base a usar");
                     con.cambiarBaseDeDatos(base);
+                    break;
+                case 4:
+                tab.crearTabla(con.getConnection());
+                break;
+
                 case 8:
                     String bbase = JOptionPane.showInputDialog(null, "Ingresa la base a eliminar");
                     con.borrarbasededatos(bbase);
