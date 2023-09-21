@@ -11,11 +11,11 @@ public class PruebaDeSQL {
         String usuario = JOptionPane.showInputDialog(null, "Ingresa tu usuario");
         String contraseña = JOptionPane.showInputDialog(null, "Ingresa tu contraseña");
         Conexion con = new Conexion();
-        short opcion = 1000;
+        short opcion;
         Scanner scan = new Scanner(System.in);
         do {
             System.out.println("--------------------------------------------------------\n"
-                    + "BIENVENIDO A SY GESTOR DE CONFIANZA \n"
+                    + "BIENVENIDO A SU GESTOR DE CONFIANZA \n"
                     + "Favor de escoger una opcion adecuada \n"
                     + "1.- Conectar a MySQL\n"
                     + "2.- Crear base de datos\n"
@@ -40,6 +40,12 @@ public class PruebaDeSQL {
                 case 3:
                     String base = JOptionPane.showInputDialog(null, "Ingresa la base a usar");
                     con.cambiarBaseDeDatos(base);
+                case 8:
+                    String bbase = JOptionPane.showInputDialog(null, "Ingresa la base a eliminar");
+                    con.borrarbasededatos(bbase);
+                case 9:
+                    con.disconnect();
+                    break;                    
             }
         } while (opcion != 0);
     }
