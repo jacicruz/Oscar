@@ -45,4 +45,15 @@ public class Conexion {
             System.err.println("Error al cambiar de base de datos: " + e.getMessage());
         }
     }
+    public void crearbasededatos(String nombreBase){
+    try{
+        if(connection != null){
+        connection.createStatement().execute("CREATE DATABASE "+nombreBase);
+        System.out.println("Se creo con exito la base de datos: "+nombreBase);
+        }
+    }catch(SQLException e){
+        System.out.println("Ocurrio un error al crear la base de datos");
+        System.out.println(e.getMessage());
+    }
+    }
 }
