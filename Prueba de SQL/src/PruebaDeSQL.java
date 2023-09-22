@@ -45,10 +45,20 @@ public class PruebaDeSQL {
                 case 4:
                 tab.crearTabla(con.getConnection());
                 break;
-
+                
+                case 5: 
+                    tab.insertarDatos(con.getConnection());
+                    break;
+                case 6:
+                    tab.actualizarDatos(con.getConnection());
+                    break;
+                case 7:
+                    tab.borrarDatos(con.getConnection());
+                    break;
                 case 8:
                     String bbase = JOptionPane.showInputDialog(null, "Ingresa la base a eliminar");
                     con.borrarbasededatos(bbase);
+                    break;
                 case 9:
                     con.disconnect();
                     break;                    
