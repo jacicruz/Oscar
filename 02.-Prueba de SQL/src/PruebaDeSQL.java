@@ -12,10 +12,10 @@ public class PruebaDeSQL {
         String contraseña = JOptionPane.showInputDialog(null, "Ingresa tu contraseña");
         Conexion con = new Conexion();
         Tablas tab = new Tablas();
-        short opcion;
+        int opcion = 100;
         Scanner scan = new Scanner(System.in);
-        do {
-            System.out.println("--------------------------------------------------------\n"
+        while (opcion != 0) {
+            String menu = ("--------------------------------------------------------\n"
                     + "BIENVENIDO A SU GESTOR DE CONFIANZA \n"
                     + "Favor de escoger una opcion adecuada \n"
                     + "1.- Conectar a MySQL\n"
@@ -23,13 +23,13 @@ public class PruebaDeSQL {
                     + "3.- Escoger una base de datos\n"
                     + "4.- Crear tabla\n"
                     + "5.- Insertar datos en una tabla\n"
-                    + "6.- actualizar datos en una tabla\n"
+                    + "6.- Actualizar datos en una tabla\n"
                     + "7.- Borrar datos de una tabla\n"
                     + "8.- Borar base de datos\n"
                     + "9.- Desconectar\n"
                     + "0.- Salir\n"
                     + "---------------------------------------------------------");
-            opcion = scan.nextShort();
+            try {opcion = Integer.parseInt(JOptionPane.showInputDialog(null, menu)); 
             switch (opcion) {
                 case 1:
                     con.connect(host, puerto, usuario, contraseña);
@@ -63,7 +63,9 @@ public class PruebaDeSQL {
                     con.disconnect();
                     break;                    
             }
-        } while (opcion != 0);
+        } catch(NumberFormatException e){
+            JOptionPane.showMessageDialog(null, "Solo puedes ingresar numeros");
+        }}
     }
 
 }
