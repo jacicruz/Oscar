@@ -353,49 +353,29 @@ package Interfaz;
 	        frame.setVisible(true);
 	    }
             
- private void initDatabaseConnection() {
+private void initDatabaseConnection() {
     try {
-        // Establece la conexión con el servidor MySQL
         Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + puerto + "/", usuario, contrasena);
-
-        // Obtiene la lista de bases de datos
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet databases = metaData.getCatalogs();
 
-        // Crea un panel para almacenar los botones de las bases de datos
         JPanel databaseButtonsPanel = new JPanel();
         databaseButtonsPanel.setLayout(new GridLayout(0, 1));
 
-        // Muestra la lista de bases de datos
         displayArea.append("Bases de Datos:\n");
         while (databases.next()) {
             String dbName = databases.getString("TABLE_CAT");
             JButton dbButton = new JButton(dbName);
-            dbButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Aquí puedes agregar la lógica para mostrar más detalles o realizar acciones
-                    displayArea.append("Base de datos seleccionada: " + dbName + "\n");
-
-                    // Al hacer clic en el botón de una base de datos, muestra sus tablas
-                    displayTablesOfDatabase(dbName);
-                }
+            dbButton.addActionListener(e -> {
+                displayArea.setText("");  // Limpiar el contenido anterior
+                displayArea.append("Base de datos seleccionada: " + dbName + "\n");
+                displayTablesOfDatabase(dbName);
             });
-            databaseButtonsPanel.add(dbButton);  // Agrega el botón al panel
-        dbButton.addActionListener(new ActionListener() {
-    @Override
-    
-    public void actionPerformed(ActionEvent e) {
-        JButton sourceButton = (JButton) e.getSource();
-        setDatabase(sourceButton.getText());  // Obtiene el nombre de la base de datos del botón
-        displayArea.append("Base de datos seleccionada: " + Database + "\n");
-
-        // Al hacer clic en el botón de una base de datos, muestra sus tablas
-        displayTablesOfDatabase(Database);
-    }
-});
+            databaseButtonsPanel.add(dbButton);
         }
 
+        JButton backButton = createBackButton();
+        databaseButtonsPanel.add(backButton);
 
         // Agrega el panel con los botones de las bases de datos al displayArea
         displayArea.setLayout(new BorderLayout());
@@ -406,23 +386,21 @@ package Interfaz;
     }
 }
 
+private JButton createBackButton() {
+    JButton backButton = new JButton("Volver al listado de bases");
+    backButton.addActionListener(e -> displayDatabaseList());
+    return backButton;
+}
+
 private void displayTablesOfDatabase(String dbName) {
     try {
-        // Establece la conexión con la base de datos seleccionada
         Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + puerto + "/" + dbName, usuario, contrasena);
-
-        // Obtiene la lista de tablas para la base de datos seleccionada
         DatabaseMetaData metaData = connection.getMetaData();
-        ResultSet tables = metaData.getTables(null, null, "%", null);
+        ResultSet tables = metaData.getTables(dbName, null, "%", new String[] { "TABLE" });
 
-        // Crea un panel para almacenar los nombres de las tablas
         JPanel tablesPanel = new JPanel();
         tablesPanel.setLayout(new GridLayout(0, 1));
 
-        // Limpia el panel antes de agregar nuevos componentes
-        tablesPanel.removeAll();
-
-        // Muestra la lista de tablas
         displayArea.append("Tablas en la base de datos " + dbName + ":\n");
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
@@ -430,27 +408,18 @@ private void displayTablesOfDatabase(String dbName) {
             tablesPanel.add(tableLabel);
         }
 
-        // Agrega un botón para volver al listado de bases de datos
-        JButton backButton = new JButton("Volver al listado de bases");
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                displayDatabaseList();
-            }
-        });
+        // Agrega el botón "Volver al listado de bases"
+        JButton backButton = createBackButton();
         tablesPanel.add(backButton);
+
+        // Limpia el displayArea y agrega el panel con los nombres de las tablas
+        displayArea.removeAll();  
+        displayArea.setLayout(new BorderLayout());
+        displayArea.add(new JScrollPane(tablesPanel), BorderLayout.CENTER);
+        displayArea.revalidate(); 
 
         // Cierra la conexión
         connection.close();
-
-        // Agrega el panel con los nombres de las tablas al displayArea
-        displayArea.removeAll();  // Limpia el displayArea
-        displayArea.setLayout(new BorderLayout());
-        displayArea.add(new JScrollPane(tablesPanel), BorderLayout.CENTER);
-
-        // Repinta la ventana para reflejar los cambios
-        SwingUtilities.getWindowAncestor(displayArea).validate();
-        SwingUtilities.getWindowAncestor(displayArea).repaint();
 
     } catch (SQLException e) {
         e.printStackTrace();
@@ -459,18 +428,13 @@ private void displayTablesOfDatabase(String dbName) {
 
 private void displayDatabaseList() {
     try {
-        // Establece la conexión con el servidor MySQL
         Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + puerto + "/", usuario, contrasena);
-
-        // Obtiene la lista de bases de datos
         DatabaseMetaData metaData = connection.getMetaData();
         ResultSet databases = metaData.getCatalogs();
 
-        // Crea un panel para almacenar los botones de las bases de datos
         JPanel databaseButtonsPanel = new JPanel();
         databaseButtonsPanel.setLayout(new GridLayout(0, 1));
 
-        // Muestra la lista de bases de datos
         displayArea.removeAll();  // Limpia el displayArea
         displayArea.setLayout(new BorderLayout());
         displayArea.add(new JScrollPane(databaseButtonsPanel), BorderLayout.CENTER);
@@ -478,35 +442,28 @@ private void displayDatabaseList() {
         while (databases.next()) {
             String dbName = databases.getString("TABLE_CAT");
             JButton dbButton = new JButton(dbName);
-            dbButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    displayArea.removeAll();  // Limpia el displayArea
-                    displayArea.setLayout(new BorderLayout());
-                    displayArea.add(new JScrollPane(databaseButtonsPanel), BorderLayout.CENTER);
-                    // Aquí puedes agregar la lógica para mostrar más detalles o realizar acciones
-                    displayArea.append("Base de datos seleccionada: " + dbName + "\n");
-
-                    // Al hacer clic en el botón de una base de datos, muestra sus tablas
-                    displayTablesOfDatabase(dbName);
-                }
+            dbButton.addActionListener(e -> {
+                displayArea.setText("");  // Limpiar el contenido anterior
+                displayArea.append("Base de datos seleccionada: " + dbName + "\n");
+                displayTablesOfDatabase(dbName);
             });
-            databaseButtonsPanel.add(dbButton);  // Agrega el botón al panel
+            databaseButtonsPanel.add(dbButton);
         }
+
+        // Agrega el botón "Volver al listado de bases"
+        JButton backButton = createBackButton();
+        databaseButtonsPanel.add(backButton);
 
         // Cierra la conexión
         connection.close();
 
         // Repinta la ventana para reflejar los cambios
-        SwingUtilities.getWindowAncestor(displayArea).validate();
-        SwingUtilities.getWindowAncestor(displayArea).repaint();
+        displayArea.revalidate();  
 
     } catch (SQLException e) {
         e.printStackTrace();
     }
 }
-
-
 
     
 	  //-----------------------------------------------------------------------------------------------------	        
