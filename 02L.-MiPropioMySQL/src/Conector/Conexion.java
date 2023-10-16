@@ -2,6 +2,7 @@ package Conector;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import javax.swing.JOptionPane;
 
 public class Conexion {
@@ -16,10 +17,13 @@ public class Conexion {
          // Establecer la conexión
          connection = DriverManager.getConnection(jdbcUrl, user, password);
          System.out.println("Conexion exitosa a MySQL");
+         JOptionPane.showMessageDialog(null, "Conexion exitosa a MySQL" );
      } catch (ClassNotFoundException e) {
          System.err.println("Error al cargar el controlador JDBC: " + e.getMessage());
+                  JOptionPane.showMessageDialog(null, "Error al cargar el controlador JDBC: " + e.getMessage());
      } catch (SQLException e) {
          System.err.println("Error al conectar a MySQL: " + e.getMessage());
+         JOptionPane.showMessageDialog(null,"Error al conectar a MySQL: " + e.getMessage());
      }
  }
     
@@ -28,11 +32,14 @@ public class Conexion {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
                 System.out.println("Conexión cerrada");
+                JOptionPane.showMessageDialog(null,"Conexión cerrada");
             }else{
                 System.out.println("No tienes una conexion establecida");
+                JOptionPane.showMessageDialog(null, "No tienes una conexion establecida");
             }
         } catch (SQLException e) {
             System.err.println("Error al cerrar la conexión: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error al cerrar la conexión: " + e.getMessage());
         }
     }
     
@@ -41,6 +48,7 @@ public class Conexion {
             if(connection != null){
             connection.createStatement().execute("USE " + nombreBaseDatos);
             System.out.println("Usando la base de datos: " + nombreBaseDatos);
+            JOptionPane.showMessageDialog(null, "Usando la base de datos: " + nombreBaseDatos);
             }else {
             System.out.println("La base de datos no existe");
             }
