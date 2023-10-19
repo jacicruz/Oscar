@@ -7,6 +7,7 @@ package Interfaz;
 	import java.util.List;
 	import Conector.Conexion;
         import java.sql.*;
+        import Tablas.Tablas;
 	
 	public class Principal {
 		//Declaracion de las variables
@@ -30,6 +31,11 @@ package Interfaz;
             String usuario;
             String contrasena;
             String Database;
+            String nombretabla;
+            String numcolum;
+            String nombrecolumna;
+            String TipoColumna;
+            String base;
             JTextArea displayArea = new JTextArea(20, 40);
 	    //Clase principal del JFrame
 	    public Principal() {
@@ -183,6 +189,7 @@ package Interfaz;
 	        JButton cancelarBdButton = new JButton("Cancelar");
 	        cancelarBdButton.setBackground(new Color(255, 0, 0));
 	        cancelarBdButton.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                
 	      //-----------------------------------------------------------------------------------------------------	        
 	        
 	      //-----------------------------------------------------------------------------------------------------	        
@@ -211,8 +218,15 @@ package Interfaz;
 	                        .addComponent(cancelarBdButton)
 	                )
 	        );
+                
+                crearBdButton.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                       crearbase(nombreTextField.getText());
+	            }
+	        });
 	      //-----------------------------------------------------------------------------------------------------	        
-	        
+	     
 	      //-----------------------------------------------------------------------------------------------------	        
 	        // Panel para "Crear tablas de bd"
 	        crearTablasPanel = new JPanel();
@@ -226,8 +240,9 @@ package Interfaz;
 	        
 	      //-----------------------------------------------------------------------------------------------------	        
 	        // ComboBox para bases de datos
-	        JComboBox<String> basesDeDatosComboBox = new JComboBox<>(new String[]{"Base de Datos 1", "Base de Datos 2", "Base de Datos 3"});
-	        JLabel nombreTablaLabel = new JLabel("Nombre de la tabla:");
+	        JComboBox<String> basesDeDatosComboBox = new JComboBox<>(new String[]{"BasedeDatos1", "Base de Datos 2", "Base de Datos 3"});
+	               
+                JLabel nombreTablaLabel = new JLabel("Nombre de la tabla:");
 	        JTextField nombreTablaTextField = new JTextField(10);
 	        JLabel cantidadColumnasLabel = new JLabel("Cantidad de columnas:");
 	        SpinnerModel spinnerModel = new SpinnerNumberModel(1, 1, 15, 1);
@@ -282,6 +297,9 @@ package Interfaz;
 	        crearTablaButton.addActionListener(new ActionListener() {
 	            @Override
 	            public void actionPerformed(ActionEvent e) {
+                        setBase(basesDeDatosComboBox.getSelectedItem().toString());
+                        setNombretabla(nombreTablaTextField.getText());
+                        setNumcolum(cantidadColumnasSpinner.getValue().toString());
 	                showTableInfoDialog(nombreTablaTextField.getText(), (int) cantidadColumnasSpinner.getValue());
 	            }
 	        });
@@ -353,6 +371,19 @@ package Interfaz;
 	        frame.setVisible(true);
 	    }
             
+            private void crearbase(String basesita){
+                String base = basesita;
+                Conexion con = new Conexion();
+                con.connect(host, puerto, usuario, contrasena);
+                con.crearbasededatos(base);
+            }
+            
+            private void creartabla(){
+            Conexion con = new Conexion();
+            con.connect(host, puerto, usuario, contrasena);
+            }
+            
+            
 private void initDatabaseConnection() {
     try {
         Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + puerto + "/", usuario, contrasena);
@@ -419,7 +450,6 @@ private void displayTablesOfDatabase(String dbName) {
         displayArea.revalidate(); 
 
         // Cierra la conexión
-        connection.close();
 
     } catch (SQLException e) {
         e.printStackTrace();
@@ -455,7 +485,7 @@ private void displayDatabaseList() {
         databaseButtonsPanel.add(backButton);
 
         // Cierra la conexión
-        connection.close();
+       
 
         // Repinta la ventana para reflejar los cambios
         displayArea.revalidate();  
@@ -486,64 +516,150 @@ private void displayDatabaseList() {
 	        cardLayout.show(mainPanel, selectedOption);
 	    }
 	  //-----------------------------------------------------------------------------------------------------	        
-	    
+	    public class ColumnInfo {
+    private String columnName;
+    private String dataType;
+    private boolean isPK;
+    private boolean isFK;
+    private boolean isUK;
+
+    public ColumnInfo(String columnName, String dataType, boolean isPK, boolean isFK, boolean isUK) {
+        this.columnName = columnName;
+        this.dataType = dataType;
+        this.isPK = isPK;
+        this.isFK = isFK;
+        this.isUK = isUK;
+    }
+
+    public String getColumnName() {
+        return columnName;
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public boolean isPK() {
+        return isPK;
+    }
+
+    public boolean isFK() {
+        return isFK;
+    }
+
+    public boolean isUK() {
+        return isUK;
+    }
+}
 	  //-----------------------------------------------------------------------------------------------------	        
-	    
-	    private void showTableInfoDialog(String tableName, int columnsCount) {
-	        JFrame tableInfoFrame = new JFrame("Información de la tabla");
-	        tableInfoFrame.setSize(500, 500);
-	        tableInfoFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+private void showTableInfoDialog(String tableName, int columnsCount) {
+    JFrame tableInfoFrame = new JFrame("Información de la tabla");
+    tableInfoFrame.setSize(500, 500);
+    tableInfoFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-	        JPanel tableInfoPanel = new JPanel();
-	        tableInfoPanel.setLayout(new BorderLayout());
+    JPanel tableInfoPanel = new JPanel();
+    tableInfoPanel.setLayout(new BorderLayout());
 
-	        JLabel tableNameLabel = new JLabel("Nombre de la tabla: " + tableName);
-	        JLabel columnsCountLabel = new JLabel("Cantidad de columnas: " + columnsCount);
+    JLabel tableNameLabel = new JLabel("Nombre de la tabla: " + tableName);
+    JLabel columnsCountLabel = new JLabel("Cantidad de columnas: " + columnsCount);
 
-	        JPanel dataPanel = new JPanel(new GridLayout(columnsCount, 4));
-	        List<JTextField> textFieldList = new ArrayList<>();
-	      //-----------------------------------------------------------------------------------------------------	        
-	        for (int i = 0; i < columnsCount; i++) {
-	            JLabel columnNameLabel = new JLabel("Columna " + (i + 1) + ":");
-	            JTextField textField = new JTextField(10);
-	            JComboBox<String> dataTypeComboBox = new JComboBox<>(new String[]{"string", "int", "float", "boolean", "date", "time", "varchar"});
-	            JCheckBox pkCheckBox = new JCheckBox("PK");
-	            JCheckBox fkCheckBox = new JCheckBox("FK");
-	            JCheckBox ukCheckBox = new JCheckBox("UK");
+    JPanel dataPanel = new JPanel(new GridLayout(columnsCount, 4));
+    List<JTextField> textFieldList = new ArrayList<>();
+    List<JComboBox<String>> dataTypeComboBoxes = new ArrayList<>();
+    List<JCheckBox> pkCheckBoxes = new ArrayList<>();
+    List<JCheckBox> fkCheckBoxes = new ArrayList<>();
+    List<JCheckBox> ukCheckBoxes = new ArrayList();
 
-	            dataPanel.add(columnNameLabel);
-	            dataPanel.add(textField);
-	            dataPanel.add(dataTypeComboBox);
-	            dataPanel.add(pkCheckBox);
-	            dataPanel.add(fkCheckBox);
-	            dataPanel.add(ukCheckBox);
+    for (int i = 0; i < columnsCount; i++) {
+        JLabel columnNameLabel = new JLabel("Columna " + (i + 1) + ":");
+        JTextField textField = new JTextField(10);
+        JComboBox<String> dataTypeComboBox = new JComboBox<>(new String[]{"string", "int", "float", "boolean", "date", "time", "varchar"});
+        JCheckBox pkCheckBox = new JCheckBox("PK");
+        JCheckBox fkCheckBox = new JCheckBox("FK");
+        JCheckBox ukCheckBox = new JCheckBox("UK");
 
-	            textFieldList.add(textField);
-	        }
-	      //-----------------------------------------------------------------------------------------------------	        
-	        
-	      //-----------------------------------------------------------------------------------------------------	        
-	        JPanel infoDisplayPanel = new JPanel();
-	        infoDisplayPanel.setLayout(new BorderLayout());
-	        infoDisplayPanel.add(tableNameLabel, BorderLayout.NORTH);
-	        infoDisplayPanel.add(columnsCountLabel, BorderLayout.CENTER);
-	        infoDisplayPanel.add(dataPanel, BorderLayout.SOUTH);
+        dataPanel.add(columnNameLabel);
+        dataPanel.add(textField);
+        dataPanel.add(dataTypeComboBox);
+        dataPanel.add(pkCheckBox);
+        dataPanel.add(fkCheckBox);
+        dataPanel.add(ukCheckBox);
 
-	        JScrollPane scrollPane = new JScrollPane(infoDisplayPanel);
-	        tableInfoPanel.add(scrollPane, BorderLayout.CENTER);
+        textFieldList.add(textField);
+        dataTypeComboBoxes.add(dataTypeComboBox);
+        pkCheckBoxes.add(pkCheckBox);
+        fkCheckBoxes.add(fkCheckBox);
+        ukCheckBoxes.add(ukCheckBox);
+    }
 
-	        JButton closeButton = new JButton("Cerrar");
-	        closeButton.addActionListener(new ActionListener() {
-	            @Override
-	            public void actionPerformed(ActionEvent e) {
-	                tableInfoFrame.dispose();
-	            }
-	        });
-	        tableInfoPanel.add(closeButton, BorderLayout.SOUTH);
+    JPanel infoDisplayPanel = new JPanel();
+    infoDisplayPanel.setLayout(new BorderLayout());
+    infoDisplayPanel.add(tableNameLabel, BorderLayout.NORTH);
+    infoDisplayPanel.add(columnsCountLabel, BorderLayout.CENTER);
+    infoDisplayPanel.add(dataPanel, BorderLayout.SOUTH);
 
-	        tableInfoFrame.add(tableInfoPanel);
-	        tableInfoFrame.setVisible(true);
-	    }
+    JScrollPane scrollPane = new JScrollPane(infoDisplayPanel);
+    tableInfoPanel.add(scrollPane, BorderLayout.CENTER);
+
+    JButton createButton = new JButton("Crear");
+    createButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            List<ColumnInfo> columnInfoList = new ArrayList<>();
+
+            for (int i = 0; i < columnsCount; i++) {
+                String columnName = textFieldList.get(i).getText();
+                String dataType = (String) dataTypeComboBoxes.get(i).getSelectedItem();
+                boolean isPK = pkCheckBoxes.get(i).isSelected();
+                boolean isFK = fkCheckBoxes.get(i).isSelected();
+                boolean isUK = ukCheckBoxes.get(i).isSelected();
+
+                ColumnInfo columnInfo = new ColumnInfo(columnName, dataType, isPK, isFK, isUK);
+                columnInfoList.add(columnInfo);
+            }
+
+            // Llamar al método para crear la tabla
+            createTableInDatabase(tableName, columnsCount );
+
+            // Cerrar el diálogo después de crear la tabla
+            tableInfoFrame.dispose();
+        }
+    });
+
+    tableInfoPanel.add(createButton, BorderLayout.SOUTH);
+
+    tableInfoFrame.add(tableInfoPanel);
+    tableInfoFrame.setVisible(true);
+}
+
+                  
+    private void createTableInDatabase(String tableName, int numColumns) {
+    Tablas tab = new Tablas();
+    Connection connection = null;
+    try {
+        // Establecer la conexión a la base de datos (asegúrate de configurar la conexión correctamente)
+        connection = DriverManager.getConnection("jdbc:mysql://"+host+":"+puerto+"/"+base+","+usuario+"," +contrasena);
+        JOptionPane.showMessageDialog(null, usuario + contrasena + base + puerto + host);
+
+        // Llamar al método existente para crear la tabla
+        tab.crearTabla(connection, tableName, numColumns);
+
+        JOptionPane.showMessageDialog(null, "Tabla creada con éxito: " + tableName);
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error de conexión a la base de datos: " + e.getMessage());
+        JOptionPane.showMessageDialog(null, usuario + contrasena + base + puerto + host);
+    } finally {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
             
             private void mostrarInfoBaseDatos(String nombreBD) {
     // Aquí puedes agregar la lógica para mostrar información sobre la base de datos
@@ -595,6 +711,49 @@ private void mostrarInfoTabla(String nombreTabla) {
     public String getDatabase() {
         return Database;
     }
+
+    public String getNumcolum() {
+        return numcolum;
+    }
+
+    public void setNumcolum(String numcolum) {
+        this.numcolum = numcolum;
+    }
+
+    public String getNombrecolumna() {
+        return nombrecolumna;
+    }
+
+    public void setNombrecolumna(String nombrecolumna) {
+        this.nombrecolumna = nombrecolumna;
+    }
+
+    public String getNombretabla() {
+        return nombretabla;
+    }
+
+    public void setNombretabla(String nombretabla) {
+        this.nombretabla = nombretabla;
+    }
+
+    public String getTipoColumna() {
+        return TipoColumna;
+    }
+
+    public void setTipoColumna(String TipoColumna) {
+        this.TipoColumna = TipoColumna;
+    }
+
+    public String getBase() {
+        return base;
+    }
+
+    public void setBase(String base) {
+        this.base = base;
+    }
+    
+    
+    
 
 	  //-----------------------------------------------------------------------------------------------------	        
 	    public static void main(String[] args) {

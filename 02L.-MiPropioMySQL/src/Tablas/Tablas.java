@@ -8,57 +8,48 @@ import javax.swing.JOptionPane;
 import java.sql.PreparedStatement;
 
 public class Tablas {
-   public static void crearTabla(Connection connection) {
-        String nombreTabla = JOptionPane.showInputDialog(null, "Ingresa el nombre de la tabla:");
-        if (nombreTabla == null || nombreTabla.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "El nombre de la tabla no puede estar vacío.");
+  public static void crearTabla(Connection connection, String nombreTabla, int numColumnas) {
+    if (nombreTabla == null || nombreTabla.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(null, "El nombre de la tabla no puede estar vacío.");
+        return;
+    }
+
+    if (numColumnas <= 0) {
+        JOptionPane.showMessageDialog(null, "El número de columnas debe ser un número entero positivo.");
+        return;
+    }
+
+    StringBuilder sql = new StringBuilder("CREATE TABLE " + nombreTabla + " (");
+
+    for (int i = 0; i < numColumnas; i++) {
+        String nombreColumna = JOptionPane.showInputDialog(null, "Nombre de la columna " + (i + 1) + ":");
+        if (nombreColumna == null || nombreColumna.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "El nombre de la columna no puede estar vacío.");
             return;
         }
 
-        String numColumnasStr = JOptionPane.showInputDialog(null, "Ingresa el número de columnas:");
-        if (numColumnasStr == null || numColumnasStr.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "El número de columnas no puede estar vacío.");
+        String tipoColumna = JOptionPane.showInputDialog(null, "Tipo de datos para " + nombreColumna + ":");
+        if (tipoColumna == null || tipoColumna.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "El tipo de datos para la columna no puede estar vacío.");
             return;
         }
 
-        int numColumnas;
-        try {
-            numColumnas = Integer.parseInt(numColumnasStr);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(null, "El número de columnas debe ser un número entero.");
-            return;
-        }
-
-        StringBuilder sql = new StringBuilder("CREATE TABLE " + nombreTabla + " (");
-
-        for (int i = 0; i < numColumnas; i++) {
-            String nombreColumna = JOptionPane.showInputDialog(null, "Nombre de la columna " + (i + 1) + ":");
-            if (nombreColumna == null || nombreColumna.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "El nombre de la columna no puede estar vacío.");
-                return;
-            }
-
-            String tipoColumna = JOptionPane.showInputDialog(null, "Tipo de datos para " + nombreColumna + ":");
-            if (tipoColumna == null || tipoColumna.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "El tipo de datos para la columna no puede estar vacío.");
-                return;
-            }
-
-            sql.append(nombreColumna).append(" ").append(tipoColumna);
-            if (i < numColumnas - 1) {
-                sql.append(", ");
-            }
-        }
-
-        sql.append(")");
-
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql.toString());
-            JOptionPane.showMessageDialog(null, "Tabla creada con éxito: " + nombreTabla);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al crear la tabla: " + e.getMessage());
+        sql.append(nombreColumna).append(" ").append(tipoColumna);
+        if (i < numColumnas - 1) {
+            sql.append(", ");
         }
     }
+
+    sql.append(")");
+
+    try (Statement statement = connection.createStatement()) {
+        statement.executeUpdate(sql.toString());
+        JOptionPane.showMessageDialog(null, "Tabla creada con éxito: " + nombreTabla);
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al crear la tabla: " + e.getMessage());
+    }
+}
+
     public static void insertarDatos(Connection connection) {
         String nombreTabla = JOptionPane.showInputDialog(null, "Ingresa el nombre de la tabla en la que deseas insertar datos:");
 
